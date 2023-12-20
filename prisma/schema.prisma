@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String    @id @default(uuid()) @db.Uuid
+  email      String    @unique
+  password   String
+  dateCreate DateTime  @default(now())
+  name       String
+  sellTax    Float     @default(0.1)
+  phone      String?
+  dateExpire DateTime?
+  role       Int       @default(1)
+  sheets     String?
+
+  purchaseInfo   PurchaseInfo[]
+  item           Item[]
+  aporte         Aporte[]
+  inventoryPrice InventoryPrice[]
+}
+
+model Plan {
+  id           String         @id @default(uuid()) @db.Uuid
+  duration     Int
+  price        Float
+  purchaseInfo PurchaseInfo[]
+}
+
+model PurchaseInfo {
+  id      String   @id @default(uuid()) @db.Uuid
+  dateBuy DateTime @default(now())
+  user    User     @relation(fields: [userId], references: [id])
+  plan    Plan     @relation(fields: [planId], references: [id])
+  userId  String   @db.Uuid
+  planId  String   @db.Uuid
+}
+
+model Item {
+  id         String    @id @default(uuid()) @db.Uuid
+  user       User      @relation(fields: [userId], references: [id])
+  date       Date      @relation(fields: [dateId], references: [id])
+  userId     String    @db.Uuid
+  dateId     String    @db.Uuid
+  buyPrice   Float
+  dateCreate DateTime  @default(now())
+  dateSold   DateTime?
+  highlights Int?
+  image      String?
+  marketUrl  String?
+  name       String
+  percentage Float?
+  realProfit Float?
+  sellPrice  Float?
+}
+
+model Date {
+  id    String @id @default(uuid()) @db.Uuid
+  item  Item[]
+  month Int
+  year  Int
+}
+
+model Aporte {
+  id         String   @id @default(uuid()) @db.Uuid
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String   @db.Uuid
+  value      Float
+  dateCreate DateTime
+}
+
+model InventoryPrice {
+  id       String   @id @default(uuid()) @db.Uuid
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String   @db.Uuid
+  value    Float
+  lastEdit DateTime @default(now())
+}
