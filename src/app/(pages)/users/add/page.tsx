@@ -1,0 +1,113 @@
+"use client";
+import {Autocomplete, AutocompleteOption, Button, Form, Input, Variant, Width} from "design-system-toshyro";
+import {useEffect, useState} from "react";
+import {Plan} from "@prisma/client";
+import formatBrl from "@/components/formatBrl";
+import {toast} from "react-toastify";
+import {useRouter} from "next/navigation";
+
+export default function AddUser() {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [plansOptions, setPlansOptions] = useState<AutocompleteOption[]>([]);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    getUsers()
+  }, []);
+
+  function getUsers() {
+    fetch('/api/plan/get/all')
+      .then(data => data.json())
+      .then(json => setPlansOptions(json.plans.map((plan: Plan) => {
+        return {
+          value: plan.id,
+          label: `${plan.duration} meses - ${formatBrl(plan.price)}`,
+        }
+      })))
+  }
+
+  function handleSubmit({r_password, ...e}:any) {
+    if (e.password !== r_password) return toast.error("As senhas deve ser idênticas.")
+
+    setLoading(true)
+
+    fetch("/api/user/create", {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(e)
+    })
+      .then(data => {
+         if(!data.ok) {
+           toast.error("Falha ao criar usuário.")
+           console.error(data.json())
+           return;
+         }
+        toast.success("Usuário criado com sucesso.")
+        router.push("/users")
+      })
+      .finally(() => setLoading(false))
+  }
+
+  return (
+    <Form
+          className={"w-4/5 max-w-[1200px] rounded-lg overflow-hidden border border-slate-700 p-10 grid grid-cols-12 gap-5"}>
+      <h1 className={"col-span-12 text-center text-2xl font-bold mb-10"}>Adicionar Usuário</h1>
+
+      <Input name={"name"}
+             label={"Nome"}
+             width={Width.SPAN_5}
+             placeholder={"Nome Sobrenome"}
+             validation={{required: "Este campo é obrigatório."}}/>
+
+      <Input name={"email"}
+             label={"Email"}
+             type={"email"}
+             width={Width.SPAN_4}
+             placeholder={"exemplo@email.com"}
+             validation={{required: "Este campo é obrigatório."}}/>
+
+      <Input name={"phone"}
+             label={"Telefone"}
+             width={Width.SPAN_3}
+             placeholder={"(99) 99999-9999"}
+             mask={"(99) 99999-9999"}/>
+
+      <Input name={"password"}
+             label={"Senha"}
+             type={"password"}
+             width={Width.SPAN_6}
+             validation={{required: "Este campo é obrigatório."}}/>
+
+      <Input name={"r_password"}
+             label={"Repetir Senha"}
+             type={"password"}
+             width={Width.SPAN_6}
+             validation={{required: "Este campo é obrigatório."}}/>
+
+      <Autocomplete name={"plan"}
+                    label={"Plano"}
+                    width={Width.SPAN_12}
+                    options={plansOptions}
+                    validation={{required: "Este campo é obrigatório."}}/>
+
+      <div className={"col-span-12 mt-10 grid grid-cols-2 gap-5"}>
+        <Button variant={Variant.CANCEL}
+                type={"button"}
+                onClick={()=> router.push("/users")}
+                full>
+          Voltar
+        </Button>
+
+        <Button full
+                onSubmit={handleSubmit}
+                disabled={loading}
+                type={"button"}
+                loading={loading}>
+          Criar
+        </Button>
+      </div>
+
+    </Form>
+  )
+}
