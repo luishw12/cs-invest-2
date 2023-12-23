@@ -6,28 +6,30 @@ import {User} from "next-auth";
 import {Role} from "@/types/enum/role";
 import Link from "next/link";
 import {HiPlusSm} from "react-icons/hi";
+import {useSession} from "next-auth/react";
 
 export default function TableUsers() {
+  const {data} = useSession()
   const [loading, setLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<User[]>();
 
   useEffect(() => {
-    getUsers()
-  }, []);
+    if (data) getUsers()
+  }, [data]);
 
   function getUsers() {
     setLoading(true);
     fetch('/api/user/get/all')
       .then(data => data.json())
-      .then(json => setUsers(json.users))
-      .finally(()=> setLoading(false))
+      .then(json => setUsers(json.filter((user: any) => user.email !== data?.user.email)))
+      .finally(() => setLoading(false))
   }
 
   const columns: TableCol[] = [
-    { name: "Nome" },
-    { name: "Email" },
-    { name: "Cargo", align: "center" },
-    { name: "Status", align: "right" },
+    {name: "Nome"},
+    {name: "Email"},
+    {name: "Cargo", align: "center"},
+    {name: "Status", align: "right"},
   ]
 
   return (

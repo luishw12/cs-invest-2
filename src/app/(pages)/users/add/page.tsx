@@ -5,6 +5,7 @@ import {Plan} from "@prisma/client";
 import formatBrl from "@/components/formatBrl";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
+import {axiosPrisma} from "../../../../../axios";
 
 export default function AddUser() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -32,17 +33,10 @@ export default function AddUser() {
 
     setLoading(true)
 
-    fetch("/api/user/create", {
-      method: "POST",
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(e)
+    axiosPrisma.post("/user/create", {
+      ...e
     })
-      .then(data => {
-         if(!data.ok) {
-           toast.error("Falha ao criar usuário.")
-           console.error(data.json())
-           return;
-         }
+      .then(() => {
         toast.success("Usuário criado com sucesso.")
         router.push("/users")
       })

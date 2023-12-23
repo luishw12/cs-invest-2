@@ -19,10 +19,10 @@ model User {
   role       Int       @default(1)
   sheets     String?
 
-  purchaseInfo   PurchaseInfo[]
-  item           Item[]
-  aporte         Aporte[]
-  inventoryPrice InventoryPrice[]
+  purchaseInfo PurchaseInfo[]
+  item         Item[]
+  aporte       Aporte[]
+  date         Date[]
 }
 
 model Plan {
@@ -50,9 +50,7 @@ model Item {
   buyPrice   Float
   dateCreate DateTime  @default(now())
   dateSold   DateTime?
-  highlights Int?
-  image      String?
-  marketUrl  String?
+  highlights Int       @default(0)
   name       String
   percentage Float?
   realProfit Float?
@@ -60,24 +58,22 @@ model Item {
 }
 
 model Date {
-  id    String @id @default(uuid()) @db.Uuid
-  item  Item[]
-  month Int
-  year  Int
+  id     String @id @default(uuid()) @db.Uuid
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
+  month  Int
+  year   Int
+
+  item   Item[]
+  aporte Aporte[]
 }
 
 model Aporte {
   id         String   @id @default(uuid()) @db.Uuid
   user       User     @relation(fields: [userId], references: [id])
+  date       Date     @relation(fields: [dateId], references: [id])
   userId     String   @db.Uuid
+  dateId     String   @db.Uuid
   value      Float
-  dateCreate DateTime
-}
-
-model InventoryPrice {
-  id       String   @id @default(uuid()) @db.Uuid
-  user     User     @relation(fields: [userId], references: [id])
-  userId   String   @db.Uuid
-  value    Float
-  lastEdit DateTime @default(now())
+  dateCreate DateTime @default(now())
 }

@@ -1,27 +1,46 @@
 "use client";
 import ModalLayout from "../_Layout";
 import { useState } from "react";
-import { CgSpinnerTwo } from "react-icons/cg";
 import {useUser} from "@/context/UserContext";
 import {useSession} from "next-auth/react";
 import {Button, Form, Input, Width} from "design-system-toshyro";
+import {toast} from "react-toastify";
+import {axiosPrisma} from "../../../../axios";
 
 export default function Configurations() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const {toggleConfig} = useUser();
 
-  const {data} = useSession();
+  const {data, update} = useSession();
 
   if (!data) return <></>
 
+  function handleSubmit({sellTax, ...e}: any) {
+    setLoading(true);
+
+    axiosPrisma.put("/user/edit", {
+        id: data?.user.id,
+        sellTax: sellTax / 100,
+        ...e
+    })
+      .then(() => {
+        toast.success("Informações alteradas.")
+        update({
+          user: {
+            name: e.name,
+            email: e.email,
+            phone: e.phone,
+            sellTax: e.sellTax,
+            sheets: e.sheets,
+          }
+        })
+      })
+      .finally(() => setLoading(false))
+  }
+
   return (
     <>
-      {loading && (
-        <div className="absolute top-0 left-0 w-screen h-screen flex items-center justify-center bg-black bg-opacity-25 z-50">
-          <CgSpinnerTwo className="animate-spin text-blue-800" size={30} />
-        </div>
-      )}
       <ModalLayout title={"Configurações"} toggle={toggleConfig}>
         <div className="p-5">
           <Form className="grid grid-cols-12 gap-5 min-w-[500px]">
@@ -53,10 +72,10 @@ export default function Configurations() {
                 label="Taxa de venda"
                 mask="99"
                 validation={{ required: "Este campo é obrigatório" }}
-                defaultValue={Math.round(data.user.sellTax * 100)}
+                defaultValue={data.user.sellTax * 100}
                 width={Width.SPAN_12}
               />
-              <div className="absolute bottom-0 right-0 font-bold text-lg h-[40px] flex items-center mr-2.5 text-gray-500 dark:text-slate-800">
+              <div className="absolute bottom-0 right-0 font-bold text-lg h-[40px] flex items-center mr-2.5 text-gray-500 dark:text-slate-200">
                 %
               </div>
             </div>
@@ -68,7 +87,9 @@ export default function Configurations() {
             />
             <div className="col-span-12">
               <Button
-                // onSubmit={}
+                onSubmit={handleSubmit}
+                loading={loading}
+                disabled={loading}
                 full
               >
                 Salvar

@@ -26,11 +26,9 @@ export default function Login() {
 
     if (res?.ok) {
       toast.success("Login efetuado.");
-      console.log("success");
       return;
     } else {
       toast.error("Falha! Verifique os campos e tente novamente.");
-      console.log("Failed", res);
     }
     return res;
   }

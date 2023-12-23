@@ -1,11 +1,14 @@
 "use client";
+
 import {months} from "@/app/(pages)/dashboard/components/months";
 import MonthSection from "@/app/(pages)/dashboard/components/MonthSection";
 import {BsArrowLeftShort, BsArrowRightShort} from "react-icons/bs";
 import {useUser} from "@/context/UserContext";
+import {useEffect, useState} from "react";
+import {useSession} from "next-auth/react";
 
 export default function Calender() {
-  const { setYear, year } = useUser();
+  const {setYear, year, dates, items} = useUser();
 
   return (
     <>
@@ -25,14 +28,17 @@ export default function Calender() {
         </button>
       </div>
 
-      <div className="grid grid-cols-4 w-full h-full overflow-hidden gap-5">
+      <div className="grid grid-cols-4 w-full h-full gap-5">
         {months.map((month, i) => {
+          const sectionDate = dates?.find(date => date.month == month.number && date.year == year);
+          const sectionItems = items?.filter(item => item.dateId == sectionDate?.id)
+
           return (
-            <MonthSection
-              key={i}
-              title={month.name}
-              number={month.number}
-            />
+            <MonthSection key={i}
+                          title={month.name}
+                          items={sectionItems}
+                          date={sectionDate}
+                          number={month.number}/>
           );
         })}
       </div>

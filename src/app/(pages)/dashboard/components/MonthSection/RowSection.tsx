@@ -10,13 +10,15 @@ export enum TypeRow {
 export interface RowSectionProps {
   title: string;
   type: TypeRow;
-  profit: boolean;
-  value: number;
-  showValue: any;
+  profit?: boolean;
+  value?: number;
+  highlight?: boolean;
 }
-export default function RowSection({title, type, profit, value, showValue}:RowSectionProps) {
+export default function RowSection({title, type, profit, value = 0,  highlight}:RowSectionProps) {
+  const profitStyle = profit ?? value > 0
+
   function Value() {
-    if (!showValue) return "-";
+    if (value === 0) return "-";
     switch (type) {
       case TypeRow.MONEY:
         return formatBrl(value)
@@ -26,20 +28,24 @@ export default function RowSection({title, type, profit, value, showValue}:RowSe
   }
 
   function className() {
-    const defaultClass = "text-right"
-    if (showValue) {
+    const defaultClass = classNames(
+      "text-right",
+      highlight && "font-semibold"
+    )
+
+    if (value !== 0) {
       switch (type) {
         case TypeRow.MONEY:
-          return classNames(defaultClass, profit ? "text-green-600" : "text-red-600")
+          return classNames(defaultClass, profitStyle ? "text-green-500" : "text-red-500")
         case TypeRow.PERCENTAGE:
-          return classNames(defaultClass, profit ? "text-blue-600 dark:text-sky-300" : "text-orange-600")
+          return classNames(defaultClass, profitStyle ? "text-blue-500 dark:text-sky-300" : "text-orange-500")
       }
     }
     return classNames(defaultClass, "text-black dark:text-slate-300")
   }
 
   return (
-    <div className="w-full grid grid-cols-2">
+    <div className="w-full grid grid-cols-2 whitespace-nowrap">
       <p>{title}</p>
       <p
         className={className()}

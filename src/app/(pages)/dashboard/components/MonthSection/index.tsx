@@ -1,35 +1,66 @@
 "use client";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {AiOutlineDollarCircle, AiOutlineEye, AiOutlinePlusCircle} from "react-icons/ai";
 import {CgSpinnerTwo} from "react-icons/cg";
-import {toast} from "react-toastify";
 import {months} from "@/app/(pages)/dashboard/components/months";
 import classNames from "@/components/classNames";
 import RowSection, {TypeRow} from "@/app/(pages)/dashboard/components/MonthSection/RowSection";
 import {useUser} from "@/context/UserContext";
+import {Date as DatePrisma, Item} from "@prisma/client";
+
+interface RowInfos {
+  averageProfit: number;
+  percentage: number;
+  inventoryPrice: number;
+  profit: number
+}
 
 interface MonthSectionProps {
   title: string;
   number: number;
+  items?: Item[];
+  date?: DatePrisma;
 }
 
 export default function MonthSection({
                                        title,
                                        number,
+                                       items,
+                                       date,
                                      }: MonthSectionProps) {
-  const { year, toggleAporte, toggleView, toggleRegister, setMonthSelected } = useUser();
-  const [loading, setLoading] = useState<boolean>(false);
+  const {year, loading, toggleAporte, toggleView, toggleRegister} = useUser();
+  const [rowsInfos, setRowsInfos] = useState<RowInfos>();
 
-  const monthInfos: any = [];
-  const investedAmount = 0
-  const profit = 0
-  const percentage = 0
-  const income = 0
-
-  const month = months.find(month => month.number === number);
+  useEffect(() => {
+    getRowsInfos()
+  }, [date, items, year]);
 
   const currentMonth = months.find(month => month.number === new Date().getMonth() + 1);
   const highlightSection = currentMonth?.number == number && year == new Date().getFullYear();
+
+  function getRowsInfos() {
+    if (!date || !items) {
+      setRowsInfos(undefined);
+      return
+    }
+
+    const soldItems = items.filter(item => item.dateSold)
+    const averageProfit = soldItems.length > 0 ? soldItems.reduce((x, y) => x + y.realProfit!, 0) / soldItems.length : 0
+
+    const percentage = soldItems.length > 0 ? soldItems.reduce((x, y) => x + y.percentage!, 0) / soldItems.length : 0
+
+    const profit = soldItems.length > 0 ? soldItems.reduce((x, y) => x + y.realProfit!, 0) : 0
+
+    const notSoldItems = items.filter(item => !item.dateSold)
+    const inventoryPrice = notSoldItems.length > 0 ? notSoldItems.reduce((x, y) => x + y.buyPrice, 0) : 0
+
+    setRowsInfos({
+      averageProfit,
+      percentage,
+      profit,
+      inventoryPrice
+    })
+  }
 
   return (
     <div className={classNames(
@@ -50,24 +81,19 @@ export default function MonthSection({
         <h5>{title}</h5>
         <div className="flex gap-2">
           <button
-            className={"hover:text-green-400 duration-100"}
+            className={"hover:text-green-400 duration-100 disabled:opacity-50 disabled:cursor-no-drop"}
+            disabled={!date}
             onClick={() => {
-              toggleAporte();
-              setMonthSelected(number);
+              toggleAporte(date);
             }}
           >
             <AiOutlineDollarCircle size={20}/>
           </button>
           <button
-            className={"hover:text-orange-400 duration-100"}
+            className={"hover:text-orange-400 duration-100 disabled:opacity-50 disabled:cursor-no-drop"}
+            disabled={!items || items?.length == 0}
             onClick={() => {
-              if (!monthInfos) return;
-              if (monthInfos.length === 0)
-                return toast.info(
-                  `Você ainda não possui items cadastrados em ${month?.name}`
-                );
-              toggleView();
-              setMonthSelected(number);
+              toggleView(date, items);
             }}
           >
             <AiOutlineEye size={20}/>
@@ -75,8 +101,7 @@ export default function MonthSection({
           <button
             className={`${highlightSection ? "hover:text-blue-300" : "hover:text-blue-400"} duration-100`}
             onClick={() => {
-              toggleRegister();
-              setMonthSelected(number);
+              toggleRegister(date);
             }}
           >
             <AiOutlinePlusCircle size={20}/>
@@ -94,31 +119,25 @@ export default function MonthSection({
           <>
             <RowSection
               title={"Rendimento Médio"}
-              showValue={investedAmount || profit}
-              profit={income > 0}
-              type={TypeRow.PERCENTAGE}
-              value={income}
+              type={TypeRow.MONEY}
+              value={rowsInfos?.averageProfit}
             />
             <RowSection
               title={"Rentabilidade"}
-              showValue={investedAmount || profit}
-              profit={percentage > 0}
               type={TypeRow.PERCENTAGE}
-              value={percentage}
+              value={rowsInfos?.percentage}
             />
             <RowSection
               title={"Valor Inventário"}
-              showValue={investedAmount !== 0}
               profit={false}
               type={TypeRow.MONEY}
-              value={investedAmount}
+              value={rowsInfos?.inventoryPrice}
             />
             <RowSection
               title={"Lucro Total"}
-              showValue={profit !== 0}
-              profit={profit > 0}
               type={TypeRow.MONEY}
-              value={profit}
+              value={rowsInfos?.profit}
+              highlight
             />
           </>
         ) : (

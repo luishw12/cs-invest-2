@@ -22,7 +22,7 @@ interface ModalLayout {
   title: string;
   qntItens?: number;
   width?: string;
-  toggle: () => void;
+  toggle: () => any;
 }
 
 export type {

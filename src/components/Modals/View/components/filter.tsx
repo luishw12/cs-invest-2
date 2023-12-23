@@ -1,26 +1,16 @@
 "use client";
-import { Button, Input, ResetForm, Select } from "design-system-toshyro";
-import { BiChevronDown } from "react-icons/bi";
-import { FaFilter } from "react-icons/fa";
-import { useState } from "react";
-import { useUser } from "@/context/UserContext";
+import {Button, Input, ResetForm, Select, Width} from "design-system-toshyro";
+import {BiChevronDown} from "react-icons/bi";
+import {FaFilter, FaSearch} from "react-icons/fa";
+import {useState} from "react";
+import {useUser} from "@/context/UserContext";
 
 export default function Filter() {
   const [filterOpen, setFilterOpen] = useState<boolean>(true);
+  const {viewFilter, currentFilterView} = useUser()
 
-  const {
-    filter,
-    soldFilter,
-    tableOrderBy,
-    setOrderBy,
-    setFilter,
-    setSoldFilter
-  } = useUser();
-
-  function handleSearch(e: any) {
-    setOrderBy({field: e.orderBy, direction: e.direction});
-    setFilter(e.name)
-    setSoldFilter(e.sold);
+  function handleSearch({name, orderBy, direction, sold}: any) {
+    viewFilter(name, {field: orderBy, direction: direction}, sold)
   }
 
   return (
@@ -33,12 +23,12 @@ export default function Filter() {
         <BiChevronDown className={`duration-300 ${filterOpen ? "rotate-180" : ""}`} />
       </button>
       <ResetForm className={`overflow-hidden duration-300 ease-in-out grid grid-cols-12 items-center gap-4 px-4 ${filterOpen ? "max-h-32 border-b py-2 dark:border-slate-600" : "max-h-0"}`}>
-        <Input label="Nome" name="name" width="col-span-4" defaultValue={filter} />
-        <Select label="Ordenar Por" name="orderBy" width="col-span-2" options={OrderByOptions} defaultValue={tableOrderBy.field} />
-        <Select label="Ordem" name="direction" width="col-span-2" options={DirectionOptions} defaultValue={tableOrderBy.direction} />
-        <Select label="Vendido" name="sold" width="col-span-2" options={SoldOptions} defaultValue={soldFilter} />
-        <div className="col-span-2 h-full flex justify-end items-center">
-          <Button title="Pesquisar" size="sm" onSubmit={handleSearch} />
+        <Input label="Nome" name="name" width={Width.SPAN_4} defaultValue={currentFilterView?.name} />
+        <Select label="Ordenar Por" name="orderBy" width={Width.SPAN_2} options={OrderByOptions} defaultValue={currentFilterView?.orderBy.field || OrderByOptions[0].value} />
+        <Select label="Ordem" name="direction" width={Width.SPAN_2} options={DirectionOptions} defaultValue={currentFilterView?.orderBy.direction || DirectionOptions[0].value} />
+        <Select label="Vendido" name="sold" width={Width.SPAN_2} options={SoldOptions} defaultValue={currentFilterView?.sold  || SoldOptions[0].value} />
+        <div className="col-span-2 h-full flex justify-end items-end">
+          <Button className={"text-sm"} onSubmit={handleSearch}>Pesquisar</Button>
         </div>
       </ResetForm>
     </>
@@ -52,7 +42,7 @@ export enum SoldOptionsEnum {
 }
 
 export const OrderByOptions = [
-  { value: 'date', label: "Data" },
+  { value: 'dateCreate', label: "Data" },
   { value: 'buyPrice', label: "Preço" },
 ]
 

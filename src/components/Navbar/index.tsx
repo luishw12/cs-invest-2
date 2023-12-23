@@ -19,7 +19,7 @@ export default function Navbar() {
         "dark:bg-slate-900 dark:bg-opacity-25 dark:text-slate-300 dark:border-slate-300"
       )}>
         <div className="h-full flex items-center">
-          <button onClick={()=> toggleTheme}>
+          <button onClick={()=> toggleTheme()}>
             {theme === "dark"
               ? <BiSolidMoon size={26} />
               : <BiSun size={26} />
@@ -28,8 +28,8 @@ export default function Navbar() {
         </div>
 
         <div className="flex gap-4 justify-center">
-          {programs.map(page=> {
-            if(!data?.user) return <></>
+          {programs.map(page => {
+            if(!data?.user) return <div key={page.id}></div>
 
             if (allowedPaths[data.user.role].includes(page.link)) {
               return (
