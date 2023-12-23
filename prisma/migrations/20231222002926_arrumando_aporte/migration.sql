@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Aporte" ALTER COLUMN "dateCreate" SET DEFAULT CURRENT_TIMESTAMP;
