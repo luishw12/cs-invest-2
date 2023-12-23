@@ -33,18 +33,10 @@ export default function ModalAporte() {
   function getAportes() {
     if(!currentDate) return;
 
-    const params = new URLSearchParams({ dateId: currentDate.id });
-
-    fetch(`/api/aporte/get/byDateId?${params}`)
-      .then(data => {
-        if(!data.ok) {
-          toast.error("Falha ao encotrar aportes.")
-          console.error(data.json())
-          return;
-        }
-        return data.json()
-      })
-      .then(aportes => setAportes(aportes))
+    axiosPrisma.get("/aporte/get/byDateId", {
+      params: { dateId: currentDate.id }
+    })
+      .then(({data}) => setAportes(data))
       .finally(() => setLoading(false))
   }
 

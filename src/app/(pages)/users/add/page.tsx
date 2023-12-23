@@ -14,13 +14,12 @@ export default function AddUser() {
   const router = useRouter();
 
   useEffect(() => {
-    getUsers()
+    getPlans()
   }, []);
 
-  function getUsers() {
-    fetch('/api/plan/get/all')
-      .then(data => data.json())
-      .then(json => setPlansOptions(json.plans.map((plan: Plan) => {
+  function getPlans() {
+    axiosPrisma.get('/plan/get/all')
+      .then(({data}) => setPlansOptions(data.map((plan: Plan) => {
         return {
           value: plan.id,
           label: `${plan.duration} meses - ${formatBrl(plan.price)}`,
@@ -65,7 +64,7 @@ export default function AddUser() {
              label={"Telefone"}
              width={Width.SPAN_3}
              placeholder={"(99) 99999-9999"}
-             mask={"(99) 99999-9999"}/>
+             typeMask={"phone"}/>
 
       <Input name={"password"}
              label={"Senha"}

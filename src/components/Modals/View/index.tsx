@@ -13,6 +13,7 @@ import formatBrl from "@/components/formatBrl";
 import {AntSwitch} from "design-system-toshyro/lib/compoments/inputs/Switch/antSwitch";
 import {toast} from "react-toastify";
 import {axiosPrisma} from "../../../../axios";
+import {LuUndo2} from "react-icons/lu";
 
 const columns: TableCol[] = [
   {name: "Nome"},
@@ -46,7 +47,7 @@ export default function ModalView() {
     const response = confirm("Tem certeza que deseja excluir este item?")
     if (response) {
       axiosPrisma.delete("/item/delete", {
-        params: { id: itemId }
+        params: {id: itemId}
       })
         .then(() => {
           toast.success("Item apagado.")
@@ -55,9 +56,19 @@ export default function ModalView() {
     }
   }
 
-  function handleSoldChange(itemId: string) {
+  function handleSetSold(itemId: string) {
     axiosPrisma.put("/item/setSold", {
-        id: itemId
+      id: itemId
+    })
+      .then(() => {
+        toast.success("Item editado.")
+      })
+      .finally(() => getInfos())
+  }
+
+  function handleRemoveSold(itemId: string) {
+    axiosPrisma.put("/item/removeSold", {
+      id: itemId
     })
       .then(() => {
         toast.success("Item editado.")
@@ -82,7 +93,7 @@ export default function ModalView() {
               const buyDate = new Date(String(item.dateCreate))
               const sellDate = item.dateSold && new Date(String(item.dateSold))
 
-              const formatDate = (date:Date) => `${date.getMonth() + 1} / ${date.getFullYear().toString().replace("20", "")}`
+              const formatDate = (date: Date) => `${date.getMonth() + 1} / ${date.getFullYear().toString().replace("20", "")}`
 
               return (
                 <tr key={key} className={"dark:bg-slate-800 dark:hover:bg-slate-700"}>
@@ -101,8 +112,17 @@ export default function ModalView() {
                   </Td>
                   <Td align="center">
                     {sellDate
-                      ? formatDate(sellDate)
-                      : <button className={"bg-blue-600 font-semibold text-white rounded-md py-0.5 px-2 hover:bg-blue-500 hover:scale-105 duration-200"}>Vendido</button>}
+                      ? (
+                        <button title={"Remover vendido"}
+                                onClick={() => handleRemoveSold(item.id)}
+                                className={"hover:text-red-500 hover:font-semibold duration-200 hover:scale-105"}>
+                          {formatDate(sellDate)}
+                        </button>
+                      ) : (
+                        <button onClick={() => handleSetSold(item.id)}
+                                className={"bg-blue-600 font-semibold text-white rounded-md py-0.5 px-2 hover:bg-blue-500 hover:scale-105 duration-200"}>
+                          Vendido
+                        </button>)}
                   </Td>
                   <Td align="right">{formatBrl(item.buyPrice)}</Td>
                   <Td align="right">

@@ -3,13 +3,13 @@ import {prisma} from "../../../../lib/prisma";
 
 export default async function handle(req: any, res: any) {
   if (req.method === "PUT") {
-    // set sold item
-    await setSoldItemHandler(req, res);
+    // remove sold item
+    await removeSoldItemHandler(req, res);
   } else {
     return res.status(405).json({ message: "Method Not allowed" });
   }
 }
-async function setSoldItemHandler(req: any, res: any) {
+async function removeSoldItemHandler(req: any, res: any) {
   const { id } = req.body;
 
   try {
@@ -18,7 +18,7 @@ async function setSoldItemHandler(req: any, res: any) {
         id
       },
       data: {
-        dateSold: new Date().toISOString()
+        dateSold: null
       },
     });
 

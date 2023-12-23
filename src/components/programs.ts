@@ -11,6 +11,11 @@ const programs = [
     name: "Usuários",
     link: "/users",
   },
+  {
+    id: Pages.PLANS,
+    name: "Planos",
+    link: "/plans",
+  },
 ];
 
 export default programs;

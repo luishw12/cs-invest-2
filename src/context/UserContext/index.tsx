@@ -7,7 +7,12 @@ import ModalRegister from "@/components/Modals/Register";
 import ModalView from "@/components/Modals/View";
 import ModalUpdate from "@/components/Modals/Update";
 import {Date as DatePrisma, Item} from "@prisma/client";
-import {SoldOptionsEnum} from "@/components/Modals/View/components/filter";
+import {
+  DirectionOptions,
+  OrderByOptions,
+  SoldOptions,
+  SoldOptionsEnum
+} from "@/components/Modals/View/components/filter";
 import {axiosPrisma} from "../../../axios";
 import {Date as PrismaDate} from ".prisma/client";
 import {useSession} from "next-auth/react";
@@ -81,26 +86,27 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
 
   useEffect(() => {
     if (!currentFilterView) {
-      setCurrentItems(items)
+      const saveItems = items?.sort((a: any, b: any) => {
+        return a.dateCreate > b.dateCreate ? 1 : -1;
+      })
+
+      setCurrentItems(saveItems)
       return;
     }
     viewFilter(currentFilterView.name, currentFilterView.orderBy, currentFilterView.sold)
   }, [items]);
 
   useEffect(() => {
-    const newTheme = theme === "light" ? "dark" : "light";
+    const localTheme = localStorage.getItem("theme")
 
     const root = document.documentElement;
     const themes = ["light", "dark"];
 
     root.classList.remove(...themes);
 
-    root.classList.add(newTheme);
-    localStorage.setItem("theme", newTheme);
-  }, [theme]);
+    root.classList.add(localTheme || "dark");
 
-  useEffect(() => {
-    setTheme(localStorage.getItem("theme"))
+    setTheme(localTheme || "dark")
   }, []);
 
   const toggleSimulation = () => setOpenSimulation(!openSimulation);
@@ -126,6 +132,14 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
 
+    const root = document.documentElement;
+    const themes = ["light", "dark"];
+
+    root.classList.remove(...themes);
+
+    root.classList.add(newTheme);
+    localStorage.setItem("theme", newTheme);
+
     setTheme(newTheme)
   }
 
@@ -133,7 +147,7 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
     let filteredItems: Item[] | undefined = currentItemsBackup;
 
     // Filtro pelo nome
-    filteredItems = currentItems?.filter(item => item.name.toLowerCase().includes(name.toLowerCase()))
+    filteredItems = filteredItems?.filter(item => item.name.toLowerCase().includes(name.toLowerCase()))
 
     // Filtro pelo orderBy
     if (filteredItems) {

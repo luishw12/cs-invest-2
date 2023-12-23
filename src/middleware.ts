@@ -5,7 +5,7 @@ import {Role} from "@/types/enum/role";
 
 const allUsers = ["/dashboard", "/config"]
 export const allowedPaths = {
-  [Role.ADMIN]: [...allUsers, "/users"],
+  [Role.ADMIN]: [...allUsers, "/users", "/plans"],
   [Role.USER]: [...allUsers],
 };
 
@@ -30,5 +30,6 @@ export const config = {
     "/dashboard",
     "/config/:path*",
     "/users/:path*",
+    "/plans/:path*",
   ],
 };
