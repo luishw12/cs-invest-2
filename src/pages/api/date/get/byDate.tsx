@@ -5,21 +5,21 @@ import handleError from "@/pages/api/_functions/handleError";
 export default async function handle(req: any, res: any) {
   if (req.method === "GET") {
     // get date by year and month
-    await handleGetByYearAndMonth(req, res, "date");
+    await handleGetByDate(req, res, "date");
   } else {
     return res.status(405).json({message: "Method Not allowed"});
   }
 }
 
-async function handleGetByYearAndMonth(req: any, res: any, model: Models) {
-  const {year} = req.query;
+async function handleGetByDate(req: any, res: any, model: Models) {
+  const {year, month} = req.query;
 
   try {
+    const where: any = { year: Number(year) }
+    if (month) where.month = Number(month)
     // @ts-ignore
     const data = await prisma[model].findMany({
-      where: {
-        year: Number(year)
-      }
+      where
     });
     return res.status(200).json(data);
   } catch (e) {

@@ -2,7 +2,7 @@
 
 import {BiSolidEdit, BiTrash} from "react-icons/bi";
 
-import React from "react";
+import React, {useState} from "react";
 import ModalLayout from "../_Layout";
 import Filter from "@/components/Modals/View/components/filter";
 import {useUser} from "@/context/UserContext";
@@ -10,10 +10,9 @@ import {Table, TableCol, Td, Th} from "design-system-toshyro";
 import {useSession} from "next-auth/react";
 import {months} from "@/app/(pages)/dashboard/components/months";
 import formatBrl from "@/components/formatBrl";
-import {AntSwitch} from "design-system-toshyro/lib/compoments/inputs/Switch/antSwitch";
 import {toast} from "react-toastify";
 import {axiosPrisma} from "../../../../axios";
-import {LuUndo2} from "react-icons/lu";
+import {Item} from "@prisma/client";
 
 const columns: TableCol[] = [
   {name: "Nome"},
@@ -37,9 +36,11 @@ export default function ModalView() {
     getInfos,
   } = useUser();
 
+  const [viewItems, setViewItems] = useState<Item[] | undefined>(currentItems);
+
   const {data} = useSession();
 
-  if (!data || !currentItems) return;
+  if (!data || !viewItems) return;
 
   const nameMonth = months.find((m) => m.number === currentDate?.month)?.name!;
 
@@ -50,35 +51,71 @@ export default function ModalView() {
         params: {id: itemId}
       })
         .then(() => {
+          setViewItems(prevItems => {
+            const updatedItems = [...prevItems!];
+            const currentItem: any = updatedItems.filter(i => i.id !== itemId);
+
+            return currentItem;
+          });
+
           toast.success("Item apagado.")
         })
         .finally(() => getInfos())
     }
   }
 
-  function handleSetSold(itemId: string) {
-    axiosPrisma.put("/item/setSold", {
+  function handleToggleSold(itemId: string, remove?: boolean) {
+    axiosPrisma.put(`/item/${remove ? "removeSold" : "setSold"}`, {
       id: itemId
     })
       .then(() => {
-        toast.success("Item editado.")
+        setViewItems(prevItems => {
+          const updatedItems = [...prevItems!];
+          const currentItem: any = updatedItems.find(i => i.id === itemId);
+
+          if (remove) currentItem!.dateSold = null;
+          else currentItem!.dateSold = new Date().toISOString();
+
+          return updatedItems;
+        });
+
+        toast.success("Item editado.");
       })
-      .finally(() => getInfos())
+      .finally(() => getInfos());
   }
 
-  function handleRemoveSold(itemId: string) {
-    axiosPrisma.put("/item/removeSold", {
-      id: itemId
+  function handleChangeHighlight(itemId: string, remove?: boolean) {
+    axiosPrisma.put(`/item/changeHighlight`, {
+      id: itemId,
+      remove
     })
       .then(() => {
-        toast.success("Item editado.")
+        const updatedItems = [...viewItems!];
+        const currentItem: any = updatedItems.find(i => i.id === itemId);
+
+        if (remove && currentItem.highlights === 0) return toast.error("O valor dos destaques não pode ser negativo.")
+
+        if (remove) {
+          currentItem.highlights -= 2;
+          currentItem.realProfit += 2;
+        }
+        else {
+          currentItem.highlights += 2;
+          currentItem.realProfit -= 2;
+        }
+        currentItem.percentage = Math.round(currentItem.realProfit / currentItem.buyPrice * 100) / 100;
+
+        setViewItems(updatedItems);
+
+        toast.success("Item editado.");
       })
-      .finally(() => getInfos())
+      .finally(() => getInfos());
   }
+
 
   return (
     <ModalLayout title={`Seus Itens de ${nameMonth}`}
-                 qntItens={currentItems.length}
+                 qntItens={viewItems.length}
                  toggle={() => {
                    toggleView()
                    resetFilterView()
@@ -89,7 +126,7 @@ export default function ModalView() {
         <div
           className={"max-h-[calc(100vh-400px)] overflow-y-auto scrollbar-thin scrollbar-track-rounded-full scrollbar-thumb-rounded-full scrollbar-thumb-gray-400 scrollbar-track-gray-100 dark:scrollbar-thumb-slate-900 dark:scrollbar-track-gray-600"}>
           <Table columns={columns}>
-            {currentItems.map((item, key) => {
+            {viewItems.map((item, key) => {
               const buyDate = new Date(String(item.dateCreate))
               const sellDate = item.dateSold && new Date(String(item.dateSold))
 
@@ -114,12 +151,12 @@ export default function ModalView() {
                     {sellDate
                       ? (
                         <button title={"Remover vendido"}
-                                onClick={() => handleRemoveSold(item.id)}
+                                onClick={() => handleToggleSold(item.id, true)}
                                 className={"hover:text-red-500 hover:font-semibold duration-200 hover:scale-105"}>
                           {formatDate(sellDate)}
                         </button>
                       ) : (
-                        <button onClick={() => handleSetSold(item.id)}
+                        <button onClick={() => handleToggleSold(item.id)}
                                 className={"bg-blue-600 font-semibold text-white rounded-md py-0.5 px-2 hover:bg-blue-500 hover:scale-105 duration-200"}>
                           Vendido
                         </button>)}
@@ -130,19 +167,15 @@ export default function ModalView() {
                   </Td>
                   <Td align="center">
                     <div className="flex items-center gap-2 justify-between w-[90px]">
-                      <button
-                        type={"button"}
-                        className={"h-4 w-4 rounded-md flex items-center justify-center text-red-500 font-bold bg-gray-300 dark:bg-slate-600 outline-none hover:ring-1 ring-red-500"}
-                        // onClick={}
-                      >
+                      <button type={"button"}
+                              className={"h-4 w-4 rounded-md flex items-center justify-center text-red-500 font-bold bg-gray-300 dark:bg-slate-600 outline-none hover:ring-1 ring-red-500"}
+                              onClick={() => handleChangeHighlight(item.id, true)}>
                         -
                       </button>
                       <div>{formatBrl(item.highlights)}</div>
-                      <button
-                        type={"button"}
-                        className={"h-4 w-4 rounded-md flex items-center justify-center text-blue-500 font-bold bg-gray-300 dark:bg-slate-600 outline-none hover:ring-1 ring-blue-500"}
-                        // onClick={}
-                      >
+                      <button type={"button"}
+                              className={"h-4 w-4 rounded-md flex items-center justify-center text-blue-500 font-bold bg-gray-300 dark:bg-slate-600 outline-none hover:ring-1 ring-blue-500"}
+                              onClick={() => handleChangeHighlight(item.id)}>
                         +
                       </button>
                     </div>

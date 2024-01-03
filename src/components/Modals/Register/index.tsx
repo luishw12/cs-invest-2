@@ -8,8 +8,9 @@ import {useState} from "react";
 import {axiosPrisma} from "../../../../axios";
 
 export default function ModalRegister() {
+  const [loading, setLoading] = useState<boolean>(false)
   const {data} = useSession();
-  const {toggleRegister, getInfos, setLoading, loading} = useUser();
+  const {toggleRegister, getInfos} = useUser();
 
   if (!data) return <></>;
 

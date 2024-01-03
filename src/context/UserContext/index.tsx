@@ -122,8 +122,8 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
   const toggleView = (date?: DatePrisma, items?: Item[]) => {
     setOpenView(!openView);
     setCurrentDate(date);
-    setCurrentItems(items)
-    setCurrentItemsBackup(items)
+    setCurrentItems(items);
+    setCurrentItemsBackup(items);
   }
   const toggleEdit = (item?: Item) => {
     setOpenEdit(!openEdit);
@@ -181,13 +181,14 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
   function getInfos() {
     if (!data) return;
     setLoading(true)
-    axiosPrisma.get("/date/get/byYear", {
+    axiosPrisma.get("/date/get/byDate", {
       params: { year: String(year) }
     })
       .then(({data}) => setDates(data))
 
+    const params: any = { userId: data.user.id }
     axiosPrisma.get("/item/get/byUserId", {
-      params: { userId: data.user.id }
+      params
     })
       .then(({data}) => setItems(data))
       .finally(() => setLoading(false))
