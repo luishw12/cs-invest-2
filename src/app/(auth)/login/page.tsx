@@ -16,20 +16,38 @@ export default function Login() {
     if (data?.user) router.push("/dashboard");
   }, [router, data?.user])
 
-  async function onSubmit(e: any) {
+  async function onSubmit({email, password}: any) {
     let res = await signIn("credentials", {
-      email: e.email,
-      password: e.password,
+      email,
+      password,
       callbackUrl: `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}`,
       redirect: false,
     });
 
+    const teste = await fetch(
+      `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/user/auth`,
+      {
+        method: "POST",
+        body: JSON.stringify({email, password}),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const user = await teste.json();
+
+    if (teste.ok && (!user.dateExpire || new Date() < new Date(user.dateExpire))) {
+      console.log(user);
+    }
+    console.log(null);
+
     if (res?.ok) {
       toast.success("Login efetuado.");
       return;
-    } else {
-      toast.error("Falha! Verifique os campos e tente novamente.");
     }
+    toast.error("Falha! Verifique os campos e tente novamente.");
+
     return res;
   }
 
