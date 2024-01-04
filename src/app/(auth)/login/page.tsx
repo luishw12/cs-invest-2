@@ -24,23 +24,7 @@ export default function Login() {
       redirect: false,
     });
 
-    const teste = await fetch(
-      `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/user/auth`,
-      {
-        method: "POST",
-        body: JSON.stringify({email, password}),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    const user = await teste.json();
-
-    if (teste.ok && (!user.dateExpire || new Date() < new Date(user.dateExpire))) {
-      console.log(user);
-    }
-    console.log(null);
+    console.log(res)
 
     if (res?.ok) {
       toast.success("Login efetuado.");
