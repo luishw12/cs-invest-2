@@ -4,13 +4,12 @@ import {useUser} from "@/context/UserContext";
 import {months} from "@/app/(pages)/dashboard/components/months";
 import formatBrl from "@/components/formatBrl";
 import {Variant} from "@/components/enum/variant";
-import {Button, ButtonProps, Form, Input, Width} from "design-system-toshyro";
+import {Button, Form, Input, Width} from "design-system-toshyro";
 import {useSession} from "next-auth/react";
 import {Aporte} from "@prisma/client";
 import {useEffect, useState} from "react";
 import {toast} from "react-toastify";
 import {Simulate} from "react-dom/test-utils";
-import load = Simulate.load;
 import {axiosPrisma} from "../../../../axios";
 
 export default function ModalAporte() {
@@ -18,6 +17,7 @@ export default function ModalAporte() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const {data} = useSession();
+
   const {
     year,
     toggleAporte,
@@ -25,19 +25,25 @@ export default function ModalAporte() {
   } = useUser();
 
   useEffect(() => {
-     getAportes()
+    getAportes()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, currentDate]);
 
   const selectedMonth = months.find(i => i.number == currentDate?.month)
 
-  function getAportes() {
-    if(!currentDate) return;
+  async function getAportes() {
+    if (!currentDate) return;
 
-    axiosPrisma.get("/aporte/get/byDateId", {
-      params: { dateId: currentDate.id }
-    })
-      .then(({data}) => setAportes(data))
-      .finally(() => setLoading(false))
+    try {
+      const response = await axiosPrisma.get("/aporte/get/byDateId", {
+        params: { dateId: currentDate.id },
+      });
+      setAportes(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar aportes:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function totalAportesValue() {
@@ -51,10 +57,10 @@ export default function ModalAporte() {
 
   function handleSubmit(e: any, remove?: boolean) {
     axiosPrisma.post("/aporte/create", {
-        userId: data?.user.id,
-        month: selectedMonth?.number,
-        year,
-        value: Number(e?.aporte) * (remove ? -1 : 1)
+      userId: data?.user?.id,
+      month: selectedMonth?.number,
+      year,
+      value: Number(e?.aporte) * (remove ? -1 : 1)
     })
       .then(() => {
         getAportes()

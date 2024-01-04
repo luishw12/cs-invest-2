@@ -7,12 +7,7 @@ import ModalRegister from "@/components/Modals/Register";
 import ModalView from "@/components/Modals/View";
 import ModalUpdate from "@/components/Modals/Update";
 import {Date as DatePrisma, Item} from "@prisma/client";
-import {
-  DirectionOptions,
-  OrderByOptions,
-  SoldOptions,
-  SoldOptionsEnum
-} from "@/components/Modals/View/components/filter";
+import {SoldOptionsEnum} from "@/components/Modals/View/components/filter";
 import {axiosPrisma} from "../../../axios";
 import {Date as PrismaDate} from ".prisma/client";
 import {useSession} from "next-auth/react";
@@ -27,8 +22,8 @@ type UserContextProps = {
   currentItem?: Item;
   currentItems?: Item[];
   currentFilterView?: { name: string, orderBy: any, sold: SoldOptionsEnum };
-  setLoading:  Dispatch<SetStateAction<boolean>>;
-  setYear:  Dispatch<SetStateAction<number>>;
+  setLoading: Dispatch<SetStateAction<boolean>>;
+  setYear: Dispatch<SetStateAction<number>>;
   toggleSimulation: () => void;
   toggleConfig: () => void;
   toggleAporte: (date?: DatePrisma) => void;
@@ -36,7 +31,7 @@ type UserContextProps = {
   toggleView: (date?: DatePrisma, items?: Item[]) => void;
   toggleEdit: (item?: Item) => void;
   toggleTheme: () => void;
-  viewFilter: (name: string, orderBy: {field: string, direction: "asc" | "desc"}, sold: SoldOptionsEnum) => void;
+  viewFilter: (name: string, orderBy: { field: string, direction: "asc" | "desc" }, sold: SoldOptionsEnum) => void;
   resetFilterView: () => void;
   getInfos: () => void;
 };
@@ -48,7 +43,7 @@ type UserContextProviderProps = {
   children: React.ReactNode;
 };
 
-export function UserContextProvider({ children }: UserContextProviderProps) {
+export function UserContextProvider({children}: UserContextProviderProps) {
   const {data} = useSession();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -76,12 +71,13 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
   useEffect(() => {
     getInfos()
 
-    const localTheme =  localStorage.getItem("theme");
+    const localTheme = localStorage.getItem("theme");
     if (localTheme === "light" || localTheme === "dark") {
       setTheme(localTheme);
       return;
     }
     localStorage.setItem("theme", theme!)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, year]);
 
   useEffect(() => {
@@ -94,6 +90,7 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
       return;
     }
     viewFilter(currentFilterView.name, currentFilterView.orderBy, currentFilterView.sold)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
   useEffect(() => {
@@ -143,7 +140,12 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
     setTheme(newTheme)
   }
 
-  const viewFilter = (name: string = "", orderBy: {field: string, direction: "asc" | "desc"}, sold: SoldOptionsEnum) => {
+  const viewFilter = (name: string = "",
+                      orderBy: {
+                        field: string,
+                        direction: "asc" | "desc"
+                      },
+                      sold: SoldOptionsEnum) => {
     let filteredItems: Item[] | undefined = currentItemsBackup;
 
     // Filtro pelo nome
@@ -180,13 +182,14 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
 
   function getInfos() {
     if (!data) return;
+
     setLoading(true)
     axiosPrisma.get("/date/get/byDate", {
-      params: { year: String(year) }
+      params: {year: String(year)}
     })
       .then(({data}) => setDates(data))
 
-    const params: any = { userId: data.user.id }
+    const params: any = {userId: data.user.id}
     axiosPrisma.get("/item/get/byUserId", {
       params
     })
@@ -220,17 +223,17 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
         getInfos,
       }}
     >
-      {openSimulation && <Simulation />}
+      {openSimulation && <Simulation/>}
 
-      {openConfig && <Configurations />}
+      {openConfig && <Configurations/>}
 
-      {openAporte && <ModalAporte />}
+      {openAporte && <ModalAporte/>}
 
-      {openRegister && <ModalRegister />}
+      {openRegister && <ModalRegister/>}
 
-      {openView && <ModalView />}
+      {openView && <ModalView/>}
 
-      {openEdit && <ModalUpdate />}
+      {openEdit && <ModalUpdate/>}
 
       {children}
     </UserContext.Provider>

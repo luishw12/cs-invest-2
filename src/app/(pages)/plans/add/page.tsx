@@ -28,7 +28,7 @@ export default function AddUser() {
   return (
     <Form
           className={"w-4/5 max-w-[1200px] rounded-lg overflow-hidden border border-slate-700 p-10 grid grid-cols-12 gap-5"}>
-      <h1 className={"col-span-12 text-center text-2xl font-bold mb-10"}>Adicionar Plano</h1>
+      <h1 className={"col-span-12 text-center text-2xl font-bold mb-10 dark:text-slate-200"}>Adicionar Plano</h1>
 
       <Input name={"duration"}
              label={"Duração (meses)"}
