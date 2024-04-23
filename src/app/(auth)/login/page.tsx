@@ -25,7 +25,7 @@ export default function Login() {
     });
 
     const teste = await fetch(
-      `/api/user/auth`,
+      `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/user/auth`,
       {
         method: "POST",
         body: JSON.stringify({
