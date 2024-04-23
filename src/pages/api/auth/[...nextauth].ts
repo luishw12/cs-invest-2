@@ -1,7 +1,5 @@
 import NextAuth, {NextAuthOptions} from "next-auth";
-import {PrismaAdapter} from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
-import {prisma} from "../../../../lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -24,7 +22,7 @@ export const authOptions: NextAuthOptions = {
         };
 
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/user/auth`,
+          `/api/user/auth`,
           {
             method: "POST",
             body: JSON.stringify(userCredentials),
