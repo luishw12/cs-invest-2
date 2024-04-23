@@ -10,7 +10,7 @@ export default function Providers({children}: DefaultLayoutInterface) {
     <SessionProvider>
       <UserContextProvider>
         {children}
-        <ToastContainer/>
+        <ToastContainer stacked />
       </UserContextProvider>
     </SessionProvider>
   )

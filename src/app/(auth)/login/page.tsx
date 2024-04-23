@@ -24,6 +24,20 @@ export default function Login() {
       redirect: false,
     });
 
+    const teste = await fetch(
+      `/api/user/auth`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          password
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
     if (res?.ok) {
       toast.success("Login efetuado.");
       return;
