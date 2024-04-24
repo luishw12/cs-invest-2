@@ -6,13 +6,19 @@ import {ToastContainer} from "react-toastify";
 import {UserContextProvider, useUser} from "@/context/UserContext";
 
 export default function Providers({children}: DefaultLayoutInterface) {
-  const {theme} = useUser()
   return (
     <SessionProvider>
       <UserContextProvider>
         {children}
-        <ToastContainer stacked theme={theme} />
+        <Toast />
       </UserContextProvider>
     </SessionProvider>
+  )
+}
+
+function Toast() {
+  const {theme} = useUser()
+  return (
+    <ToastContainer stacked theme={theme} />
   )
 }

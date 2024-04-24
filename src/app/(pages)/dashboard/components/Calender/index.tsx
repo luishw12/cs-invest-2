@@ -4,8 +4,7 @@ import {months} from "@/app/(pages)/dashboard/components/months";
 import MonthSection from "@/app/(pages)/dashboard/components/MonthSection";
 import {BsArrowLeftShort, BsArrowRightShort} from "react-icons/bs";
 import {useUser} from "@/context/UserContext";
-import {useEffect, useState} from "react";
-import {useSession} from "next-auth/react";
+import classNames from "@/components/classNames";
 
 export default function Calender() {
   const {setYear, year, dates, items} = useUser();
@@ -28,7 +27,13 @@ export default function Calender() {
         </button>
       </div>
 
-      <div className="grid grid-cols-4 w-full h-full gap-5">
+      <div className={classNames(
+        "grid w-full gap-5 p-10 pt-0",
+        "2xl:grid-cols-4 2xl:grid-rows-3",
+        "lg:grid-cols-3 lg:grid-rows-3",
+        "sm:grid-cols-2 sm:grid-rows-2",
+        "grid-cols-1 grid-rows-1",
+      )}>
         {months.map((month, i) => {
           const sectionDate = dates?.find(date => date.month == month.number && date.year == year);
           const sectionItems = items?.filter(item => item.dateId == sectionDate?.id)

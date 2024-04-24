@@ -64,7 +64,7 @@ export default function MonthSection({
 
   return (
     <div className={classNames(
-      "rounded-xl overflow-hidden border-2",
+      "rounded-xl overflow-hidden border-2 h-[220px]",
       highlightSection ? "dark:border-blue-800" : "dark:border-slate-700",
       highlightSection ? "border-blue-700" : "border-slate-700"
     )}
