@@ -13,7 +13,7 @@ import {Date as PrismaDate} from ".prisma/client";
 import {useSession} from "next-auth/react";
 
 type UserContextProps = {
-  theme: string | null;
+  theme: string;
   loading: boolean;
   year: number;
   dates?: DatePrisma[];
@@ -48,7 +48,7 @@ export function UserContextProvider({children}: UserContextProviderProps) {
 
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [theme, setTheme] = useState<string | null>("dark")
+  const [theme, setTheme] = useState<string>("dark")
 
   const [year, setYear] = useState<number>(new Date().getFullYear());
 
