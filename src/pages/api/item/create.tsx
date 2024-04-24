@@ -44,7 +44,7 @@ async function createItemHandler(req: any, res: any) {
       dateId: await getDateId(),
       buyPrice: buy,
       sellPrice: sell,
-      percentage: Math.round(profit / buy * 100) / 100,
+      percentage: Math.round(profit / buy * 1000) / 10,
       realProfit: profit,
       ...body
     }
