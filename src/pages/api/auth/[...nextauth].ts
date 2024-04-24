@@ -43,7 +43,7 @@ const handler: NextApiHandler = async (req, res) => {
           };
 
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/user/auth`,
+            `${process.env.NEXTAUTH_URL}/api/user/auth`,
             {
               method: "POST",
               body: JSON.stringify(userCredentials),
