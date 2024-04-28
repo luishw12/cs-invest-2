@@ -26,7 +26,7 @@ async function changeHighlighHandler(req: any, res: any) {
       data: {
         highlights: remove ? currentItem.highlights -= 2 : currentItem.highlights += 2,
         realProfit: remove ? currentItem.realProfit! += 2 : currentItem.realProfit! -= 2,
-        percentage: Math.round(currentItem.realProfit! / currentItem.buyPrice * 100) / 100,
+        percentage: Math.round(currentItem.realProfit! / currentItem.buyPrice * 1000) / 10,
       },
     });
 
