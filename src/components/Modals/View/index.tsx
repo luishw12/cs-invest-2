@@ -103,7 +103,7 @@ export default function ModalView() {
           currentItem.highlights += 2;
           currentItem.realProfit -= 2;
         }
-        currentItem.percentage = Math.round(currentItem.realProfit / currentItem.buyPrice * 100) / 100;
+        currentItem.percentage = Math.round(currentItem.realProfit / currentItem.buyPrice * 1000) / 10;
 
         setViewItems(updatedItems);
 
