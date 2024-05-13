@@ -1,16 +1,20 @@
 "use client";
 import {Button, Input, ResetForm, Select, Width} from "design-system-toshyro";
 import {BiChevronDown} from "react-icons/bi";
-import {FaFilter, FaSearch} from "react-icons/fa";
+import {FaFilter} from "react-icons/fa";
 import {useState} from "react";
 import {useUser} from "@/context/UserContext";
 
-export default function Filter() {
+interface FilterProps {
+  reload: () => void;
+}
+export default function Filter({reload}: FilterProps) {
   const [filterOpen, setFilterOpen] = useState<boolean>(true);
   const {viewFilter, currentFilterView} = useUser()
 
   function handleSearch({name, orderBy, direction, sold}: any) {
     viewFilter(name, {field: orderBy, direction: direction}, sold)
+    reload();
   }
 
   return (

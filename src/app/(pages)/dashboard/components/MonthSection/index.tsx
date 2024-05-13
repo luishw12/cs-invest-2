@@ -39,20 +39,25 @@ export default function MonthSection({
   const highlightSection = currentMonth?.number == number && year == new Date().getFullYear();
 
   function getRowsInfos() {
+    let percentage = 0;
+    let averageProfit = 0;
+    let profit = 0;
+    let inventoryPrice = 0;
+
     if (!date || !items) {
       setRowsInfos(undefined);
       return
     }
 
     const soldItems = items.filter(item => item.dateSold)
-    const averageProfit = soldItems.length > 0 ? soldItems.reduce((x, y) => x + y.realProfit!, 0) / soldItems.length : 0
-
-    const percentage = soldItems.length > 0 ? soldItems.reduce((x, y) => x + y.percentage!, 0) / soldItems.length : 0
-
-    const profit = soldItems.length > 0 ? soldItems.reduce((x, y) => x + y.realProfit!, 0) : 0
-
     const notSoldItems = items.filter(item => !item.dateSold)
-    const inventoryPrice = notSoldItems.length > 0 ? notSoldItems.reduce((x, y) => x + y.buyPrice, 0) : 0
+
+    if (soldItems.length > 0) {
+      percentage = Math.round(soldItems.reduce((x, y) => x + y.percentage!, 0) / soldItems.length * 10) / 10
+      averageProfit = soldItems.reduce((x, y) => x + y.realProfit!, 0) / soldItems.length
+      profit = soldItems.reduce((x, y) => x + y.realProfit!, 0)
+      inventoryPrice = notSoldItems.reduce((x, y) => x + y.buyPrice, 0)
+    }
 
     setRowsInfos({
       averageProfit,
