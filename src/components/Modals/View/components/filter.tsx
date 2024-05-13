@@ -6,15 +6,15 @@ import {useState} from "react";
 import {useUser} from "@/context/UserContext";
 
 interface FilterProps {
-  reload: () => void;
+  updateInfos: (items: any) => void;
 }
-export default function Filter({reload}: FilterProps) {
+export default function Filter({updateInfos}: FilterProps) {
   const [filterOpen, setFilterOpen] = useState<boolean>(true);
   const {viewFilter, currentFilterView} = useUser()
 
   function handleSearch({name, orderBy, direction, sold}: any) {
-    viewFilter(name, {field: orderBy, direction: direction}, sold)
-    reload();
+    const items = viewFilter(name, {field: orderBy, direction: direction}, sold)
+    updateInfos(items);
   }
 
   return (

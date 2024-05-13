@@ -31,7 +31,7 @@ type UserContextProps = {
   toggleView: (date?: DatePrisma, items?: Item[]) => void;
   toggleEdit: (item?: Item) => void;
   toggleTheme: () => void;
-  viewFilter: (name: string, orderBy: { field: string, direction: "asc" | "desc" }, sold: SoldOptionsEnum) => void;
+  viewFilter: (name: string, orderBy: { field: string, direction: "asc" | "desc" }, sold: SoldOptionsEnum) => any;
   resetFilterView: () => void;
   getInfos: () => void;
 };
@@ -175,6 +175,8 @@ export function UserContextProvider({children}: UserContextProviderProps) {
 
     setCurrentFilterView({name, orderBy, sold})
     setCurrentItems(filteredItems)
+
+    return filteredItems;
   }
   const resetFilterView = () => {
     setCurrentFilterView(undefined);
