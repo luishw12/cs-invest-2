@@ -1,7 +1,6 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import { Role } from "@/types/enum/role";
-import runMiddleware, { cors } from "../lib/cors";
 
 const allUsers = ["/dashboard", "/config"];
 export const allowedPaths = {
@@ -10,8 +9,6 @@ export const allowedPaths = {
 };
 
 export async function middleware(req: NextRequest): Promise<NextResponse> {
-  // Executa o middleware CORS
-  await runMiddleware(req, new NextResponse(), cors);
 
   const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
