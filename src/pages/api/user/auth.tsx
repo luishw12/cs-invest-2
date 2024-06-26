@@ -1,6 +1,28 @@
 import {prisma} from "../../../../lib/prisma";
 import {hashPassword} from "@/pages/api/user/create";
+import Cors from "cors";
+
+// Initialize the cors middleware
+const cors = Cors({
+  methods: ["POST", "GET", "HEAD"],
+  origin: "http://your-frontend-domain.com", // Substitua pelo seu domínio de frontend
+});
+
+// Helper method to wait for a middleware to execute before continuing
+function runMiddleware(req: any, res: any, fn: any) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result: any) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
+}
+
 export default async function handle(req: any, res: any) {
+  await runMiddleware(req, res, cors);
+  
   if (req.method === "POST") {
     //login user
     await loginUserHandler(req, res);
