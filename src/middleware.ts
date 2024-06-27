@@ -8,38 +8,21 @@ export const allowedPaths = {
   [Role.USER]: [...allUsers],
 };
 
-// Função para adicionar cabeçalhos CORS
-function addCorsHeaders(response: any) {
-  response.headers.set("Access-Control-Allow-Origin", "*"); // Permite qualquer origem - use com cuidado em produção
-  response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  return response;
-}
-
 export async function middleware(req: NextRequest): Promise<NextResponse> {
-
-  // Configurar cabeçalhos CORS para requisições OPTIONS
-  if (req.method === "OPTIONS") {
-    const response = NextResponse.next();
-    return addCorsHeaders(response);
-  }
 
   const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
 
   if (!session) {
-    const response = NextResponse.redirect(`${process.env.NEXTAUTH_URL}/login/?callbackUrl=${pathname}`);
-    return addCorsHeaders(response);
+    return NextResponse.redirect(`${ process.env.NEXTAUTH_URL }/login/?callbackUrl=${ pathname }`);
   }
 
   const userRolePaths = allowedPaths[session.role];
   if (userRolePaths && !userRolePaths.some((path) => pathname.includes(path))) {
-    const response = NextResponse.redirect(`${process.env.NEXTAUTH_URL}/dashboard`);
-    return addCorsHeaders(response);
+    return NextResponse.redirect(`${ process.env.NEXTAUTH_URL }/dashboard`);
   }
 
-  const response = NextResponse.next();
-  return addCorsHeaders(response);
+  return NextResponse.next();
 }
 
 export const config = {
