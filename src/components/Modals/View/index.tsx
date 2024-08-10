@@ -157,7 +157,9 @@ export default function ModalView() {
                         </button>
                       ) : (
                         <button onClick={() => handleToggleSold(item.id)}
-                                className={"bg-blue-600 font-semibold text-white rounded-md py-0.5 px-2 hover:bg-blue-500 hover:scale-105 duration-200"}>
+                                disabled={!item.sellPrice}
+                                title={!item.sellPrice ? "Para vender precisa de um Valor de venda." : undefined}
+                                className={"bg-blue-600 font-semibold text-white rounded-md py-0.5 px-2 hover:bg-blue-500 hover:scale-105 duration-200 disabled:opacity-50 disabled:hover:scale-100"}>
                           Vendido
                         </button>)}
                   </Td>

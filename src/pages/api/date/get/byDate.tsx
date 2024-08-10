@@ -12,10 +12,11 @@ export default async function handle(req: any, res: any) {
 }
 
 async function handleGetByDate(req: any, res: any, model: Models) {
-  const {year, month} = req.query;
+  const {userId, year, month} = req.query;
 
   try {
-    const where: any = { year: Number(year) }
+    const where: any = { userId, year: Number(year) }
+
     if (month) where.month = Number(month)
     // @ts-ignore
     const data = await prisma[model].findMany({

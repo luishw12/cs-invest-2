@@ -187,7 +187,7 @@ export function UserContextProvider({children}: UserContextProviderProps) {
 
     setLoading(true)
     axiosPrisma.get("/date/get/byDate", {
-      params: {year: String(year)}
+      params: {userId: data.user.id, year: String(year)}
     })
       .then(({data}) => setDates(data))
 

@@ -58,7 +58,6 @@ export default function ModalRegister() {
           label="Valor da Venda"
           type="number"
           className={"border-slate-700"}
-          validation={{required: "Este campo é obrigatório"}}
           width={Width.SPAN_6}
         />
         <div className="col-span-12 grid grid-cols-2 gap-5 mt-5">
