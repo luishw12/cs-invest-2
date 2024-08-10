@@ -112,6 +112,10 @@ export default function ModalView() {
       .finally(() => getInfos());
   }
 
+  if(viewItems.length === 0) {
+    toggleView();
+    return;
+  }
 
   return (
     <ModalLayout title={`Seus Itens de ${nameMonth}`}
