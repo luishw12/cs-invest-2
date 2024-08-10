@@ -52,11 +52,12 @@ export default function MonthSection({
     const soldItems = items.filter(item => item.dateSold)
     const notSoldItems = items.filter(item => !item.dateSold)
 
+    inventoryPrice = notSoldItems.reduce((x, y) => x + y.buyPrice, 0)
+
     if (soldItems.length > 0) {
       percentage = Math.round(soldItems.reduce((x, y) => x + y.percentage!, 0) / soldItems.length * 10) / 10
       averageProfit = soldItems.reduce((x, y) => x + y.realProfit!, 0) / soldItems.length
       profit = soldItems.reduce((x, y) => x + y.realProfit!, 0)
-      inventoryPrice = notSoldItems.reduce((x, y) => x + y.buyPrice, 0)
     }
 
     setRowsInfos({
